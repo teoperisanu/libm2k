@@ -4,7 +4,7 @@ import libm2k
 from shapefile import shape_gen, ref_shape_gen, shape_name
 from analog_functions import  test_amplitude, test_shape, phase_diff_ch0_ch1,  test_offset, test_analog_trigger, test_voltmeter_functionality
 from analog_functions import cyclic_buffer_test, set_samplerates_for_shapetest, set_trig_for_cyclicbuffer_test
-from analog_functions import compare_in_out_frequency, test_oversampling_ratio, channels_diff_in_samples
+from analog_functions import compare_in_out_frequency, test_oversampling_ratio, channels_diff_in_samples, test_timeout
 import reset_def_values as reset
 from open_context_and_files import ctx, ain, aout, trig, results_dir, results_file, csv_path, calibration, create_dir
 import logging
@@ -222,8 +222,24 @@ class A_AnalogTests(unittest.TestCase):
                 self.assertEqual(osr_test[i], 1, 'oversampling on channel'+str(i) )
    
 
+    def test_timeout(self):
+        """Verifies if there is data aqcuisition if trigger is reset after timeout occurs
+        """
+        reset.analog_in(ain)
+        reset.analog_out(aout)
+        reset.trigger(trig)
+        for i in range(2):
+            data=False
+            offset, average, t_occ=test_timeout(ctx,ain,aout,trig,i,results_dir, results_file, csv_path)
+            if average>=(offset-0.1*offset) and average<=(offset+0.1*offset):
+                data=True
 
-
+            if t_occ==True:
+                with self.subTest(msg='Timeout occured'):
+                        self.assertEqual(data,True, 'Data was not acquired correct after timeout')
+            else:
+                with self.subTest(msg='No timeout'):
+                        self.assertEqual(data,True, 'Data was not acquired correct')
 
 
 

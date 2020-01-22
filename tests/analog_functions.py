@@ -12,6 +12,8 @@ import pandas
 import random
 import sys
 import logging
+import reset_def_values as reset
+from open_context_and_files import ctx_timeout
 #dicts that will be saved to csv files
 shape_csv_vals={}
 ampl_csv_vals={}
@@ -21,6 +23,7 @@ trig_csv_vals={}
 cyclic_csv_vals={}
 freq_csv_vals={}
 osr_csv_vals={}
+timeout_csv_vals={}
 
 
 def set_trig_for_signalshape_test(i,  channel, trig, delay):
@@ -62,7 +65,7 @@ def set_samplerates_for_shapetest(ain, aout):
     adc_sample_rate=1000000
     dac_a_sample_rate=7500000
     dac_b_sample_rate=7500000
-    test_frequency=10000
+    test_frequency=1831
     out0_buffer_samples=int(dac_a_sample_rate/test_frequency)
     out1_buffer_samples=int(dac_b_sample_rate/test_frequency)
     ain.setSampleRate(adc_sample_rate)
@@ -217,9 +220,9 @@ def test_shape(channel,out_data,ref_data,ain,aout,trig, ch_ratio, shapename, dir
         phase_diff_vect=np.append(phase_diff_vect,phase_diff)
         file.write("Correlation coefficient between "+ shapename[i] +"signal and its reference:" +str(corr_shape)+"\n")
         file.write("Phase difference between "+ shapename[i] +"signal and its reference:" +str(phase_diff)+"\n")
+        aout.stop(channel)
+        aout.enableChannel(channel, True)
     plt.close()
-    aout.stop(channel)
-    aout.enableChannel(channel, True)
     return corr_shape_vect, phase_diff_vect
 
 
@@ -447,11 +450,13 @@ def test_offset(out_data,n, ain, aout,trig, channel, dir_name, file, csv_path ):
         in_offset=np.append(in_offset,average)# put all the average values in a vector
         if channel==0:
             plot_to_file('Signal offset  on channel 0',  input_data[channel],dir_name, 'offsets_ch0.png')
-            offset_csv_vals['Offset'+ str(i)+ 'ch0']=input_data
-            save_data_to_csv(trig_csv_vals, csv_path+'offset.csv')
+            offset_csv_vals['Offset'+ str(i)+ 'ch0']=input_data[channel]
+            save_data_to_csv(offset_csv_vals, csv_path+'offset.csv')
 
         else:
             plot_to_file('Signal offset  on channel 1',  input_data[channel],dir_name, 'offsets_ch1.png')
+            offset_csv_vals['Offset'+ str(i)+ 'ch0']=input_data[channel]
+            save_data_to_csv(offset_csv_vals, csv_path+'offset.csv')
     plt.close()
     file.write("Offset values computed: \n"+str(in_offset)+"\n")
     corr_offset, _= pearsonr(offset, in_offset)  #compare the original offset vector with the average values obtained
@@ -533,7 +538,7 @@ def cyclic_buffer_test(aout, ain, channel, trig, dir_name, file, csv_path, ctx):
         cyclic_false -- Must be 1 if a single buffer was sent and succesfully recieved, 0 otherwise
     """
     #test the cyclic buffer condition
-    ctx.setTimeout(100000000)
+    ctx.setTimeout(10000000) #set large value of timeout so single buffer is captured
     aout.setCyclic(False)
     ain.setSampleRate(10000)
     aout.setSampleRate(channel,75000)
@@ -574,7 +579,7 @@ def cyclic_buffer_test(aout, ain, channel, trig, dir_name, file, csv_path, ctx):
     aout.stop(channel)
     aout.enableChannel(channel, True)
     aout.setCyclic(True)
-    ctx.setTimeout(1000)
+    ctx.setTimeout(ctx_timeout) #set the timeout to the initial value
     return cyclic_false
 
 def get_samples_notcyclic(n_samples, ain, channel):
@@ -721,7 +726,7 @@ def test_oversampling_ratio(channel, ain, aout,trig, file, csv_path):
     verify_osr=[]
     adc_sr=100000000
     dac_sr=75000000
-    out_nr_samples=1000 #a smaller number of sample so the zero rising edge crossing  is easier to detect
+    out_nr_samples=1024 #a smaller number of sample so the zero rising edge crossing  is easier to detect
     ain.setSampleRate(adc_sr)
     aout.setSampleRate(channel, dac_sr)
     ch_sampleratio=dac_sr/adc_sr #ratio between dac sample rate and adc sample rate
@@ -867,3 +872,66 @@ def channels_diff_in_samples(trig, channel, aout, ain, file, csv_path):
     
     return  diff_adc_sr, adc_sr, dac_osr, freq
 
+def test_timeout(ctx,ain,aout,trig, channel, dir_name, file, csv_path):
+    """Set timeout, set trigger. Acquire data and if timeout occurs, set timeout to 0 and reset trigger then acquire data again.
+    The signal has an offset so if you compute the mean it is different than 0.
+    Arguments:
+        ctx-Context\n
+        ain  -- AnalogIn object \n
+        aout  -- AnalogOut object\n
+        trig -- Trigger object\n
+        channel -- Analog channel under test\n
+        dir_name -- Directory where the plot files are saved\n
+        file -- Text file where are saved reference and computed values during the test\n
+        csv_path -- Path to the csv file where are saved the samples\n
+    Returns
+        offset -- value of the average set
+        average-- value of the computed average
+        t_occ-- False by default, True if timeout occurred
+    """
+    timeout_val=2 #value of the timeout, small value so timeout occurrs during test
+    t_occ=False
+    in_samples=4096
+    out_samples=4096
+    offset=0.5 #average value of the signal
+    suma=0
+    average=0
+    #gen out_data buffer
+    x=offset+np.sin(np.linspace(-np.pi, np.pi, out_samples))
+    out_data=[x,x]#output buffer, same signal on both analog channels
+    set_trig(trig,0,0,libm2k.FALLING_EDGE_ANALOG,0) #set trigger condition
+    ctx.setTimeout(timeout_val) #set timeout
+    ain.flushBuffer() #flush buffer so previous values will not influence average
+    #send data
+    aout.push(out_data)
+    try:
+        input_data = ain.getSamples(in_samples) #get data
+    except:
+        #timeout occurred
+        t_occ=True
+        ctx.setTimeout(0)#set timeout to 0
+        reset.trigger(trig) #reset trigger
+        input_data = ain.getSamples(in_samples) #getdata after timeout and trigger reset
+
+    for s in input_data[channel]: #compute average value of the acquired data
+            suma=suma+s
+    average=suma/in_samples
+
+    ctx.setTimeout(ctx_timeout)#set timeout to the initial value
+    
+    file.write("\n\n Timeout test on channel " +str(channel)+"\n")
+    file.write("Timeout occured:\n"+ str(t_occ)+"\n")
+    file.write("Average of the data set:" +str(offset)+"\n Average of the data read: "+str(average)+"\n")
+    if channel==0:
+        plot_to_file('Timeout: '+str(t_occ)+' on ch'+str(channel),  input_data[channel],dir_name, 'timeout'+str(t_occ)+'_ch0.png')
+        timeout_csv_vals['Timeout: '+ str(t_occ)+ ' ch0']=input_data[channel]
+        save_data_to_csv(timeout_csv_vals, csv_path+'timeout.csv')
+
+    else:
+        plot_to_file('Timeout: '+str(t_occ)+ ' on ch'+str(channel),  input_data[channel],dir_name, 'timeout'+str(t_occ)+'_ch1.png')
+        timeout_csv_vals['Timeout: '+ str(t_occ)+ ' ch1']=input_data[channel]
+        save_data_to_csv(timeout_csv_vals, csv_path+'timeout.csv')
+    plt.close()
+    aout.stop(channel)
+    aout.enableChannel(channel, True)
+    return offset, average, t_occ
