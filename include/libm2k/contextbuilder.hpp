@@ -26,6 +26,7 @@
 #include <string>
 #include <libm2k/m2kglobal.hpp>
 #include <libm2k/context.hpp>
+#include <libm2k/m2k.hpp>
 #include <libm2k/enums.hpp>
 #include <unordered_set>
 #include <map>
