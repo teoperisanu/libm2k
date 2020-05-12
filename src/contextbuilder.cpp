@@ -37,25 +37,26 @@
 using namespace libm2k::context;
 using namespace libm2k::utils;
 
-std::vector<Context*> ContextBuilder::s_connectedDevices = {};
-std::map<ContextTypes, std::vector<std::string>> ContextBuilder::m_dev_map = {
-	{ContextTypes::CtxFMCOMMS, {"cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy"}},
-	{ContextTypes::CtxM2K, {"m2k-adc", "m2k-dac-a",
-				"m2k-dac-b", "m2k-logic-analyzer-rx",
-				"m2k-logic-analyzer-tx", "m2k-logic-analyzer"}},
-	{ContextTypes::CtxLIDAR, {"ad7091", "ltc2471", "xadc", "ad5627", "ad9528",
-				  "7c700000.axi-pulse-capture", "axi-ad9094-hpc"}}
-};
-
-std::map<ContextTypes, std::string> ContextBuilder::m_dev_name_map = {
-	{ContextTypes::CtxFMCOMMS, "FMMCOMMS"},
-	{ContextTypes::CtxM2K, "M2K"},
-	{ContextTypes::CtxLIDAR, "LIDAR"},
-	{Other, "Generic"}
-};
 
 ContextBuilder::ContextBuilder()
 {
+
+	s_connectedDevices = {};
+	m_dev_map = {
+		{ContextTypes::CtxFMCOMMS, {"cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy"}},
+		{ContextTypes::CtxM2K, {"m2k-adc", "m2k-dac-a",
+										       "m2k-dac-b", "m2k-logic-analyzer-rx",
+										 "m2k-logic-analyzer-tx", "m2k-logic-analyzer"}},
+		{ContextTypes::CtxLIDAR, {"ad7091", "ltc2471", "xadc", "ad5627", "ad9528",
+													  "7c700000.axi-pulse-capture", "axi-ad9094-hpc"}}
+	};
+
+	m_dev_name_map = {
+		{ContextTypes::CtxFMCOMMS, "FMMCOMMS"},
+		{ContextTypes::CtxM2K, "M2K"},
+		{ContextTypes::CtxLIDAR, "LIDAR"},
+		{Other, "Generic"}
+	};
 }
 
 ContextBuilder::~ContextBuilder()
@@ -263,58 +264,58 @@ ContextTypes ContextBuilder::identifyContext(iio_context *ctx)
 	}
 	return type;
 }
-
-Context *libm2k::context::contextOpen()
-{
-	return ContextBuilder::contextOpen();
-}
-
-Context *libm2k::context::contextOpen(const char *uri)
-{
-	return ContextBuilder::contextOpen(uri);
-}
-
-Context *libm2k::context::contextOpen(struct iio_context *ctx, const char *uri)
-{
-	return ContextBuilder::contextOpen(ctx, uri);
-}
-
-M2k *libm2k::context::m2kOpen(const char *uri)
-{
-	return ContextBuilder::m2kOpen(uri);
-}
-
-M2k *libm2k::context::m2kOpen(struct iio_context *ctx, const char *uri)
-{
-	return ContextBuilder::m2kOpen(ctx, uri);
-}
-
-M2k *libm2k::context::m2kOpen()
-{
-	return ContextBuilder::m2kOpen();
-}
-
-std::vector<struct libm2k::CONTEXT_INFO*> libm2k::context::getContextsInfo()
-{
-	return ContextBuilder::getContextsInfo();
-}
-
-std::vector<std::string> libm2k::context::getAllContexts()
-{
-	return ContextBuilder::getAllContexts();
-}
-
-void libm2k::context::contextClose(Context *ctx, bool deinit)
-{
-	ContextBuilder::contextClose(ctx, deinit);
-}
-
-void libm2k::context::contextCloseAll()
-{
-	ContextBuilder::contextCloseAll();
-}
-
-std::string libm2k::context::getVersion()
-{
-	return ContextBuilder::getVersion();
-}
+//
+//Context *libm2k::context::contextOpen()
+//{
+//	return ContextBuilder::contextOpen();
+//}
+//
+//Context *libm2k::context::contextOpen(const char *uri)
+//{
+//	return ContextBuilder::contextOpen(uri);
+//}
+//
+//Context *libm2k::context::contextOpen(struct iio_context *ctx, const char *uri)
+//{
+//	return ContextBuilder::contextOpen(ctx, uri);
+//}
+//
+//M2k *libm2k::context::m2kOpen(const char *uri)
+//{
+//	return ContextBuilder::m2kOpen(uri);
+//}
+//
+//M2k *libm2k::context::m2kOpen(struct iio_context *ctx, const char *uri)
+//{
+//	return ContextBuilder::m2kOpen(ctx, uri);
+//}
+//
+//M2k *libm2k::context::m2kOpen()
+//{
+//	return ContextBuilder::m2kOpen();
+//}
+//
+//std::vector<struct libm2k::CONTEXT_INFO*> libm2k::context::getContextsInfo()
+//{
+//	return ContextBuilder::getContextsInfo();
+//}
+//
+//std::vector<std::string> libm2k::context::getAllContexts()
+//{
+//	return ContextBuilder::getAllContexts();
+//}
+//
+//void libm2k::context::contextClose(Context *ctx, bool deinit)
+//{
+//	ContextBuilder::contextClose(ctx, deinit);
+//}
+//
+//void libm2k::context::contextCloseAll()
+//{
+//	ContextBuilder::contextCloseAll();
+//}
+//
+//std::string libm2k::context::getVersion()
+//{
+//	return ContextBuilder::getVersion();
+//}

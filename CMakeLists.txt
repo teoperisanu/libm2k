@@ -57,11 +57,11 @@ endif()
 add_definitions(-DLIBM2K_EXPORTS=1)
 
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
-if (WIN32)
+#if (WIN32)
 	set(CMAKE_SHARED_MODULE_PREFIX "")
 	set(CMAKE_STATIC_LIBRARY_PREFIX "")
 	SET(CMAKE_IMPORT_LIBRARY_PREFIX "")
-endif()
+#endif()
 
 # Get the GIT hash of the latest commit
 if (GIT_FOUND)

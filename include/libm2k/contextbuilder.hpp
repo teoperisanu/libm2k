@@ -30,6 +30,13 @@
 #include <unordered_set>
 #include <map>
 
+
+
+namespace libm2k {
+
+
+namespace context {
+
 enum ContextTypes {
 	CtxFMCOMMS,
 	CtxM2K,
@@ -37,21 +44,16 @@ enum ContextTypes {
 	Other
 };
 
-namespace libm2k {
-
-
-namespace context {
-
     /**
      * @private
      */
 class LIBM2K_API ContextBuilder {
-	static std::vector<Context*> s_connectedDevices;
+	std::vector<Context*> s_connectedDevices;
 public:
 	/**
 	* @private
 	*/
-	explicit ContextBuilder();
+	ContextBuilder();
 	/**
 	* @private
 	*/
@@ -59,49 +61,49 @@ public:
 	/**
 	 * @private
 	 */
-	 static std::vector<struct libm2k::CONTEXT_INFO*> getContextsInfo();
+	  std::vector<struct libm2k::CONTEXT_INFO*> getContextsInfo();
 	/**
 	* @private
 	*/
-	static std::vector<std::string> getAllContexts();
+	 std::vector<std::string> getAllContexts();
 	/**
 	 * @private
 	 */
-	static Context* contextOpen(const char*);
+	 Context* contextOpen(const char*);
 	/**
 	* @private
 	*/
-	static Context* contextOpen(struct iio_context*, const char*);
+	 Context* contextOpen(struct iio_context*, const char*);
 	/**
 	* @private
 	*/
-	static Context* contextOpen();
+	 Context* contextOpen();
 	/**
 	* @private
 	*/
-	static M2k* m2kOpen(const char*);
+	 M2k* m2kOpen(const char*);
 	/**
 	* @private
 	*/
-	static M2k* m2kOpen(struct iio_context*, const char*);
+	 M2k* m2kOpen(struct iio_context*, const char*);
 	/**
 	* @private
 	*/
-	static M2k* m2kOpen();
+	 M2k* m2kOpen();
 	/**
 	* @private
 	*/
-	static void contextClose(Context*, bool deinit = true);
+	 void contextClose(Context*, bool deinit = true);
 
-	static void contextCloseAll();
+	 void contextCloseAll();
 
-	static std::string getVersion();
+	 std::string getVersion();
 private:
-	static std::map<ContextTypes, std::vector<std::string>> m_dev_map;
-	static std::map<ContextTypes, std::string> m_dev_name_map;
+	 std::map<ContextTypes, std::vector<std::string>> m_dev_map;
+	 std::map<ContextTypes, std::string> m_dev_name_map;
 	//                std::shared_ptr<M2KImpl> m_pimpl;
-	static ContextTypes identifyContext(iio_context *ctx);
-	static Context* buildContext(ContextTypes type,
+	 ContextTypes identifyContext(iio_context *ctx);
+	 Context* buildContext(ContextTypes type,
 		std::string uri,
 		struct iio_context *ctx,
 		bool sync);
@@ -117,89 +119,89 @@ private:
  */
 
 
-/**
-* @private
-*/
-LIBM2K_API Context* contextOpen();
-
-
-/**
- * @private
- */
-LIBM2K_API Context* contextOpen(const char* uri);
-
-
-/**
- * @private
- */
-LIBM2K_API Context* contextOpen(struct iio_context* ctx, const char* uri);
-
-
-/**
- * @brief Open an ADALM2000 based on a given uri
- * @param uri Describe the location of the context
- * @return M2k object or nullptr if no ADALM2000 was found/available
- *
- * @note the uri can be something similar to:
- * "ip:192.168.2.1" or "usb:1.6.5"
- */
-LIBM2K_API M2k* m2kOpen(const char* uri);
-
-
-/**
- * @brief Open an ADALM2000 based on an existing iio_context and uri
- * @param ctx A pointer to an iio_context structure
- * @param uri Describe the location of the context
- * @return M2k object or nullptr if no ADALM2000 was found/available
- *
- * @note the uri can be something similar to:
- * "ip:192.168.2.1" or "usb:1.6.5"
- */
-LIBM2K_API M2k* m2kOpen(struct iio_context* ctx, const char* uri);
-
-
-/**
- * @brief Open an ADALM2000
- * @return M2k object or nullptr if no ADALM2000 was found/available
- *
- * @note this will try to open USB connected devices
- */
-LIBM2K_API M2k* m2kOpen();
-
-
-/**
- * @brief List the information about all available contexts
- * @return A list containing the info about available contexts
- */
-LIBM2K_API std::vector<struct libm2k::CONTEXT_INFO*> getContextsInfo();
-
-
-/**
- * @brief List all available contexts
- * @return A list containing the available contexts
- */
-LIBM2K_API std::vector<std::string> getAllContexts();
-
-
-/**
- * @brief Destroy the given context
- * @param ctx The context to be destroyed
- * @param deinit If deinit is set to false, running contexts won't be affected
- */
-LIBM2K_API void contextClose(Context* ctx, bool deinit = true);
-
-
-/**
- * @brief Close all the devices
- */
-LIBM2K_API void contextCloseAll();
-
-
-/**
- * @brief Get library version
- * @return a string containing the libm2k version
- */
-LIBM2K_API std::string getVersion();
+///**
+//* @private
+//*/
+//LIBM2K_API Context* contextOpen();
+//
+//
+///**
+// * @private
+// */
+//LIBM2K_API Context* contextOpen(const char* uri);
+//
+//
+///**
+// * @private
+// */
+//LIBM2K_API Context* contextOpen(struct iio_context* ctx, const char* uri);
+//
+//
+///**
+// * @brief Open an ADALM2000 based on a given uri
+// * @param uri Describe the location of the context
+// * @return M2k object or nullptr if no ADALM2000 was found/available
+// *
+// * @note the uri can be something similar to:
+// * "ip:192.168.2.1" or "usb:1.6.5"
+// */
+//LIBM2K_API M2k* m2kOpen(const char* uri);
+//
+//
+///**
+// * @brief Open an ADALM2000 based on an existing iio_context and uri
+// * @param ctx A pointer to an iio_context structure
+// * @param uri Describe the location of the context
+// * @return M2k object or nullptr if no ADALM2000 was found/available
+// *
+// * @note the uri can be something similar to:
+// * "ip:192.168.2.1" or "usb:1.6.5"
+// */
+//LIBM2K_API M2k* m2kOpen(struct iio_context* ctx, const char* uri);
+//
+//
+///**
+// * @brief Open an ADALM2000
+// * @return M2k object or nullptr if no ADALM2000 was found/available
+// *
+// * @note this will try to open USB connected devices
+// */
+//LIBM2K_API M2k* m2kOpen();
+//
+//
+///**
+// * @brief List the information about all available contexts
+// * @return A list containing the info about available contexts
+// */
+//LIBM2K_API std::vector<struct libm2k::CONTEXT_INFO*> getContextsInfo();
+//
+//
+///**
+// * @brief List all available contexts
+// * @return A list containing the available contexts
+// */
+//LIBM2K_API std::vector<std::string> getAllContexts();
+//
+//
+///**
+// * @brief Destroy the given context
+// * @param ctx The context to be destroyed
+// * @param deinit If deinit is set to false, running contexts won't be affected
+// */
+//LIBM2K_API void contextClose(Context* ctx, bool deinit = true);
+//
+//
+///**
+// * @brief Close all the devices
+// */
+//LIBM2K_API void contextCloseAll();
+//
+//
+///**
+// * @brief Get library version
+// * @return a string containing the libm2k version
+// */
+//LIBM2K_API std::string getVersion();
 
 
 /**
