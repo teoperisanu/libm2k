@@ -94,8 +94,11 @@ static void throw_exception(libm2k::M2K_EXCEPTION exc_type, std::string exceptio
 	case libm2k::EXC_INVALID_PARAMETER: {
 		throw std::invalid_argument("ERR: Invalid argument - " + exception);
 	}
+	case libm2k::EXC_INVALID_FIRMWARE_VERSION: {
+		throw std::runtime_error("ERR: Runtime - " + exception);
+	}
 	default: {
-		throw std::runtime_error("ERR: Generic - " + exception);
+		throw std::runtime_error("ERR: Invalid firmware version. Minimum required version: " + exception);
 	}
 	}
 #else

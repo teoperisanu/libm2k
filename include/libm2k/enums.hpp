@@ -64,7 +64,8 @@ namespace libm2k {
 		EXC_OUT_OF_RANGE,
 		EXC_RUNTIME_ERROR,
 		EXC_INVALID_PARAMETER,
-		EXC_TIMEOUT
+		EXC_TIMEOUT,
+		EXC_INVALID_FIRMWARE_VERSION,
 	};
 
 
@@ -151,6 +152,19 @@ namespace libm2k {
 		SELECT_TRIGGER_IN = 2, ///< SELECT_TRIGGER_IN - forwards trigger events from TI pin(trigger in)
 		SELECT_ANALOG_IN = 3, ///< SELECT_ANALOG_IN  - forwards trigger events from AnalogIn interface
 		SELECT_DIGITAL_IN = 4 ///< SELECT_DIGITAL_IN - forwards trigger events from DigitalIn interface
+	};
+
+
+	/**
+	* @enum M2K_TRIGGER_OUT_SOURCE
+	* @brief Select the triggering source for a DeviceOut
+	*/
+	enum M2K_TRIGGER_OUT_SOURCE {
+		SRC_OUT_NONE = 0, ///< SRC_OUT_NONE - no trigger events
+		SRC_OUT_TRIGGER_IN = 1, ///< SRC_OUT_TRIGGER_IN - trigger events on the TI(trigger in) pin trigger the Output interface
+		SRC_OUT_TRIGGER_OUT = 2, ///< SRC_OUT_TRIGGER_OUT - trigger events on the TO(trigger out) pin trigger the Output interface
+		SRC_OUT_ANALOG_IN = 3, ///< SRC_OUT_ANALOG_IN  - trigger events on the AnalogIn interface trigger the Output interface
+		SRC_OUT_DIGITAL_IN = 4, ///< SRC_OUT_DIGITAL_IN - trigger events on the DigitalIn interface trigger the Output interface
 	};
 
 
