@@ -65,12 +65,12 @@ M2kImpl::M2kImpl(std::string uri, iio_context* ctx, std::string name, bool sync)
 
 	m_firmware_version = getFirmwareVersion();
 
-	int diff = Utils::compareVersions(m_firmware_version, "v0.24");
-	if (diff < 0) {	//m_firmware_version < 0.24
-		m_trigger = new M2kHardwareTriggerImpl(ctx);
-	} else {
+//	int diff = Utils::compareVersions(m_firmware_version, "v0.24");
+//	if (diff < 0) {	//m_firmware_version < 0.24
+//		m_trigger = new M2kHardwareTriggerImpl(ctx);
+//	} else {
 		m_trigger = new M2kHardwareTriggerV024Impl(ctx);
-	}
+//	}
 
 	if (!m_trigger) {
 		throw_exception(EXC_INVALID_PARAMETER, "Can't instantiate M2K board; M2K trigger is invalid.");
@@ -332,15 +332,23 @@ void M2kImpl::startMixedSignalAcquisition(unsigned int nb_samples)
 	m_trigger->setDigitalStreamingFlag(false);
 
 	if (!hasAnalogTrigger && !hasDigitalTrigger) {
+		std::cout << "A\n";
+
 		m_trigger->setAnalogSource(NO_SOURCE);
 		m_trigger->setDigitalSource(SRC_ANALOG_IN);
 	} else if (!hasDigitalTrigger) {
+		std::cout << "B\n";
+
 		m_trigger->setAnalogSource(NO_SOURCE);
 		m_trigger->setDigitalSource(SRC_ANALOG_IN);
 	} else if (!hasAnalogTrigger) {
+		std::cout << "C\n";
+
 		m_trigger->setDigitalSource(SRC_DISABLED);
 		m_trigger->setAnalogSource(SRC_DIGITAL_IN);
 	}
+
+	m_instancesDigital.at(0)->setRateMux();
 
 	m_trigger->setAnalogStreamingFlag(streamingFlagAnalog);
 	for (auto analogIn : m_instancesAnalogIn) {
@@ -352,11 +360,17 @@ void M2kImpl::startMixedSignalAcquisition(unsigned int nb_samples)
 	}
 
 	if (!hasAnalogTrigger && !hasDigitalTrigger) {
-		m_trigger->setAnalogMode(CHANNEL_1, ALWAYS);
+		std::cout << "A\n";
+
+//		m_trigger->setAnalogMode(CHANNEL_1, ALWAYS);
 		m_trigger->setAnalogSource(CHANNEL_1);
 	} else if (!hasDigitalTrigger) {
+		std::cout << "B\n";
+
 		m_trigger->setAnalogSource(analogSource);
 	} else if (!hasAnalogTrigger) {
+		std::cout << "C\n";
+
 		m_trigger->setDigitalSource(digitalSource);
 	}
 }
@@ -369,6 +383,7 @@ void M2kImpl::stopMixedSignalAcquisition()
 	for (auto digital : m_instancesDigital) {
 		digital->stopAcquisition();
 	}
+	m_instancesDigital.at(0)->resetRateMux();
 	m_trigger->setAnalogSource(analogSource);
 	m_trigger->setDigitalSource(digitalSource);
 }
@@ -392,10 +407,11 @@ bool M2kImpl::hasAnalogTrigger()
 	case CHANNEL_1_XOR_CHANNEL_2:
 		return m_trigger->getAnalogMode(CHANNEL_1) || m_trigger->getAnalogMode(CHANNEL_2);
 	case SRC_DIGITAL_IN:
-		if (m_trigger->getDigitalSource() == SRC_ANALOG_IN) {
-			return true;
-		}
-		return hasDigitalTrigger();
+		return false;
+//		if (m_trigger->getDigitalSource() == SRC_ANALOG_IN) {
+//			return true;
+//		}
+//		return hasDigitalTrigger();
 	case CHANNEL_1_OR_SRC_LOGIC_ANALYZER:
 		if (m_trigger->getDigitalSource() == SRC_ANALOG_IN) {
 			return true;
@@ -438,16 +454,17 @@ bool M2kImpl::hasDigitalTrigger()
 		}
 		return false;
 	case SRC_ANALOG_IN:
-		switch (m_trigger->getAnalogSource()) {
-		case SRC_DIGITAL_IN:
-		case CHANNEL_1_OR_SRC_LOGIC_ANALYZER:
-		case CHANNEL_2_OR_SRC_LOGIC_ANALYZER:
-		case CHANNEL_1_OR_CHANNEL_2_OR_SRC_LOGIC_ANALYZER:
-			return true;
-		default:
-			break;
-		}
-		return hasAnalogTrigger();
+		return false;
+//		switch (m_trigger->getAnalogSource()) {
+//		case SRC_DIGITAL_IN:
+//		case CHANNEL_1_OR_SRC_LOGIC_ANALYZER:
+//		case CHANNEL_2_OR_SRC_LOGIC_ANALYZER:
+//		case CHANNEL_1_OR_CHANNEL_2_OR_SRC_LOGIC_ANALYZER:
+//			return true;
+//		default:
+//			break;
+//		}
+//		return hasAnalogTrigger();
 	case SRC_TRIGGER_IN:
 		return true;
 	case SRC_DISABLED:

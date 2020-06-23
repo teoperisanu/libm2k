@@ -57,13 +57,13 @@ std::vector<std::string> M2kHardwareTriggerV024Impl::m_trigger_source = {
 	"a_OR_trigger_in",
 	"b_OR_trigger_in",
 	"a_OR_b_OR_trigger_in",
-	"disable",
+	"disabled",
 };
 
 std::vector<std::string> M2kHardwareTriggerV024Impl::m_trigger_ext_digital_source = {
 	"trigger-logic",
 	"trigger-in",
-	"disable"
+	"trigger-disable"
 };
 
 typedef std::pair<Channel *, std::string> channel_pair;
@@ -158,7 +158,7 @@ void M2kHardwareTriggerV024Impl::setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL ext
 		source = "trigger-in";
 		break;
 	case SRC_DISABLED:
-		source = "disable";
+		source = "trigger-disable";
 		break;
 	}
 	m_digital_trigger_device->setStringValue(16, "trigger_mux_out", source);
@@ -186,7 +186,7 @@ M2K_TRIGGER_SOURCE_DIGITAL M2kHardwareTriggerV024Impl::getDigitalSource() const
 		}
 	} else if (source == "trigger-in") {
 		return SRC_ANALOG_IN;
-	} else if (source == "disable") {
+	} else if (source == "disabled") {
 		return SRC_DISABLED;
 	}
 	return SRC_NONE;

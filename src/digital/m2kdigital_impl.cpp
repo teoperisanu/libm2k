@@ -459,3 +459,13 @@ void M2kDigitalImpl::getSamples(std::vector<unsigned short> &data, unsigned int 
 		throw_exception(EXC_INVALID_PARAMETER, "M2K Digital: " + string(e.what()));
 	}
 }
+
+void M2kDigitalImpl::setRateMux()
+{
+	m_dev_read->setStringValue("rate_mux", "oscilloscope");
+}
+
+void M2kDigitalImpl::resetRateMux()
+{
+	m_dev_read->setStringValue("rate_mux", "logic_analyzer");
+}
