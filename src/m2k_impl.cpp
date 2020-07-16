@@ -322,14 +322,14 @@ void M2kImpl::startMixedSignalAcquisition(unsigned int nb_samples)
 	analogSource = m_trigger->getAnalogSource();
 	digitalSource = m_trigger->getDigitalSource();
 
-	bool streamingFlagAnalog = m_trigger->getAnalogStreamingFlag();
-	bool streamingFlagDigital = m_trigger->getDigitalStreamingFlag();
+	//bool streamingFlagAnalog = m_trigger->getAnalogStreamingFlag();
+	//bool streamingFlagDigital = m_trigger->getDigitalStreamingFlag();
 
 	hasAnalogTrigger = this->hasAnalogTrigger();
 	hasDigitalTrigger = this->hasDigitalTrigger();
 
-	m_trigger->setAnalogStreamingFlag(false);
-	m_trigger->setDigitalStreamingFlag(false);
+	//m_trigger->setAnalogStreamingFlag(false);
+	//m_trigger->setDigitalStreamingFlag(false);
 
 	if (!hasAnalogTrigger && !hasDigitalTrigger) {
 		std::cout << "A\n";
@@ -350,11 +350,11 @@ void M2kImpl::startMixedSignalAcquisition(unsigned int nb_samples)
 
 	m_instancesDigital.at(0)->setRateMux();
 
-	m_trigger->setAnalogStreamingFlag(streamingFlagAnalog);
+	//m_trigger->setAnalogStreamingFlag(streamingFlagAnalog);
 	for (auto analogIn : m_instancesAnalogIn) {
 		analogIn->startAcquisition(nb_samples);
 	}
-	m_trigger->setDigitalStreamingFlag(streamingFlagDigital);
+	//m_trigger->setDigitalStreamingFlag(streamingFlagDigital);
 	for (auto digital : m_instancesDigital) {
 		digital->startAcquisition(nb_samples);
 	}
