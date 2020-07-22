@@ -95,7 +95,7 @@ static void throw_exception(libm2k::M2K_EXCEPTION exc_type, std::string exceptio
 		throw std::invalid_argument("ERR: Invalid argument - " + exception);
 	}
 	case libm2k::EXC_TIMEOUT: {
-		throw std::invalid_argument("ERR: Timeout - " + exception);
+		throw timeout_exception("ERR: Timeout - " + exception);
 	}
 	default: {
 		throw std::runtime_error("ERR: Generic - " + exception);
