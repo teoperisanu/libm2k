@@ -112,7 +112,7 @@ M2K_TRIGGER_OUT_SELECT M2kHardwareTriggerV024Impl::getAnalogExternalOutSelect()
 		auto it = std::find(m_digital_out_select.begin(),
 				    m_digital_out_select.end(), buf.c_str());
 		if  (it == m_digital_out_select.end()) {
-			throw_exception(EXC_OUT_OF_RANGE, "unexpected value read from attribute: out_select");
+			throw_exception(m2k_exception::make("Unexpected value read from attribute: out_select").type(libm2k::EXC_OUT_OF_RANGE).build());
 		}
 
 		return static_cast<M2K_TRIGGER_OUT_SELECT>(it - m_digital_out_select.begin());
@@ -206,7 +206,7 @@ M2K_TRIGGER_SOURCE_ANALOG M2kHardwareTriggerV024Impl::getAnalogSource()
 	auto it = std::find(m_trigger_source.begin(),
 			    m_trigger_source.end(), buf.c_str());
 	if  (it == m_trigger_source.end()) {
-		throw_exception(EXC_OUT_OF_RANGE, "unexpected value read from attribute: logic_mode / source");
+		throw_exception(m2k_exception::make("Unexpected value read from attribute: logic_mode / source").type(libm2k::EXC_OUT_OF_RANGE).build());
 	}
 
 	return static_cast<M2K_TRIGGER_SOURCE_ANALOG>(it - m_trigger_source.begin());
