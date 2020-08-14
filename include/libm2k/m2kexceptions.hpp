@@ -19,12 +19,12 @@
  *
  */
 
-#ifndef M2KEXCEPTIONS_H
-#define M2KEXCEPTIONS_H
+#ifndef M2KEXCEPTIONS_HPP
+#define M2KEXCEPTIONS_HPP
 
 #include <libm2k/m2kglobal.hpp>
-#include <libm2k/logger.hpp>
 #include <libm2k/enums.hpp>
+#include <libm2k/logger.hpp>
 #include <stdexcept>
 #include <string>
 #include <iostream>
@@ -115,4 +115,4 @@ static void throw_exception(const m2k_exception &exception)
 }
 }
 
-#endif // M2KEXCEPTIONS_H
+#endif // M2KEXCEPTIONS_HPP
