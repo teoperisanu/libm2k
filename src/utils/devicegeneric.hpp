@@ -108,6 +108,7 @@ protected:
 	std::vector<Channel*> m_channel_list_in;
 	std::vector<Channel*> m_channel_list_out;
 	Buffer* m_buffer;
+	std::string m_dev_name;
 };
 }
 }
