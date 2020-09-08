@@ -22,6 +22,7 @@
 #include "buffer.hpp"
 #include "channel.hpp"
 #include <libm2k/m2kexceptions.hpp>
+#include <libm2k/logger.hpp>
 #include <libm2k/utils/utils.hpp>
 
 #include <iostream>
@@ -38,10 +39,11 @@ Buffer::Buffer(struct iio_device *dev) {
 		m_dev = nullptr;
 		THROW_M2K_EXCEPTION("Buffer: Device not found, so no buffer can be created", libm2k::EXC_INVALID_PARAMETER);
 	}
+	m_dev_name = iio_device_get_name(m_dev);
 
 	unsigned int dev_count = iio_device_get_buffer_attrs_count(m_dev);
 	if (dev_count <= 0) {
-		THROW_M2K_EXCEPTION("Buffer: Device is not buffer capable, no buffer can be created", libm2k::EXC_INVALID_PARAMETER);
+		THROW_M2K_EXCEPTION("Buffer: Device " + m_dev_name + " is not buffer capable, no buffer can be created", libm2k::EXC_INVALID_PARAMETER);
 	}
 	m_buffer = nullptr;
 	m_last_nb_samples = 0;
@@ -78,6 +80,9 @@ void Buffer::initializeBuffer(unsigned int size, bool cyclic, bool output)
 				THROW_M2K_EXCEPTION("Buffer: Cannot create the RX buffer", libm2k::EXC_RUNTIME_ERROR, errno);
 			}
 		}
+		output ? LIBM2K_LOG(INFO, m_dev_name, "TX buffer created (" + std::to_string(size) + " samples)") :
+			 LIBM2K_LOG(INFO, m_dev_name, "RX buffer created (" + std::to_string(size) + " samples)");
+		LIBM2K_LOG_IF(WARNING, size % 4 != 0 || size < 16, m_dev_name, "Incorrect number of samples");
 	}
 }
 
@@ -128,6 +133,7 @@ void Buffer::push(unsigned short *data, unsigned int channel, unsigned int nb_sa
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 	}
@@ -173,6 +179,7 @@ void Buffer::push(std::vector<short> const &data, unsigned int channel,
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 	}
@@ -217,6 +224,7 @@ void Buffer::push(std::vector<unsigned short> const &data, unsigned int channel,
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 
@@ -250,6 +258,7 @@ void Buffer::push(std::vector<double> const &data, unsigned int channel, bool cy
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 	}
@@ -294,6 +303,7 @@ void Buffer::push(double *data, unsigned int channel, unsigned int nb_samples, b
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 	}
@@ -325,6 +335,7 @@ void Buffer::push(short *data, unsigned int channel, unsigned int nb_samples, bo
 			}
 			THROW_M2K_EXCEPTION("Buffer: Cannot push TX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		}
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer pushed");
 	} else {
 		THROW_M2K_EXCEPTION("Buffer: Please setup channels before pushing data", libm2k::EXC_INVALID_PARAMETER);
 	}
@@ -351,6 +362,7 @@ void Buffer::getSamples(std::vector<unsigned short> &data, unsigned int nb_sampl
 		}
 		THROW_M2K_EXCEPTION("Buffer: Cannot refill RX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, "Buffer refilled");
 
 	unsigned short* d_ptr = (unsigned short*)iio_buffer_start(m_buffer);
 	for (unsigned int i = 0; i < nb_samples; i++) {
@@ -386,6 +398,7 @@ const unsigned short* Buffer::getSamplesP(unsigned int nb_samples)
 		THROW_M2K_EXCEPTION("Buffer: Cannot refill RX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		return nullptr;
 	}
+	LIBM2K_LOG(INFO, m_dev_name, "Buffer refilled");
 
 	const unsigned short* data = (const unsigned short*)iio_buffer_start(m_buffer);
 	return data;
@@ -462,6 +475,7 @@ void* Buffer::getSamplesRawInterleavedVoid(unsigned int nb_samples)
 		THROW_M2K_EXCEPTION("Buffer: Cannot refill RX buffer", libm2k::EXC_RUNTIME_ERROR, ret);
 		return nullptr;
 	}
+	LIBM2K_LOG(INFO, m_dev_name, "Buffer refilled");
 
 	return m_channel_list.at(0)->getFirstVoid(m_buffer);
 }
@@ -504,6 +518,7 @@ void Buffer::stop()
 	if (m_buffer) {
 		iio_buffer_cancel(m_buffer);
 	}
+
 	destroy();
 }
 
@@ -511,6 +526,7 @@ void Buffer::destroy()
 {
 	if (m_buffer) {
 		iio_buffer_destroy(m_buffer);
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer destroyed");
 		m_buffer = nullptr;
 		m_last_nb_samples = 0;
 	}
@@ -520,6 +536,7 @@ void Buffer::cancelBuffer()
 {
 	if (m_buffer) {
 		iio_buffer_cancel(m_buffer);
+		LIBM2K_LOG(INFO, m_dev_name, "Buffer canceled");
 	}
 }
 
