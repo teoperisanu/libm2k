@@ -18,47 +18,53 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-#ifndef LOGGER_H
-#define LOGGER_H
 
-#ifdef LIBM2K_LOG4CPP
+#ifndef LOGGER_HPP
+#define LOGGER_HPP
 
-#include <log4cpp/Appender.hh>
-#include <log4cpp/OstreamAppender.hh>
-#include <log4cpp/BasicLayout.hh>
-#include <log4cpp/Priority.hh>
-#include <log4cpp/Category.hh>
-
-#endif
-
-#include <string>
-#include <iostream>
-#include <libm2k/m2kglobal.hpp>
+// operations
+#define LIBM2K_ATTRIBUTE_WRITE "write"
+#define LIBM2K_ATTRIBUTE_READ "read"
 
 #ifdef LIBM2K_ENABLE_LOG
-	#define LOG(x) libm2k::Logger::getInstance().warn(x)
+#include <glog/logging.h>
+
+/**
+ * S - severity
+ * D - device
+ * C - channel
+ * A - attribute
+ * O - operation
+ * M - message
+ *
+ * Format: [D][C][A][O] M
+ */
+#define LIBM2K_LOG_2(S, M) LOG(S) << M
+#define LIBM2K_LOG_3(S, D, M) LOG(S) << ("[" + D + "] " + M)
+#define LIBM2K_LOG_4(S, D, C, M) LOG(S) << ("[" + D + "][" + C + "] " + M)
+#define LIBM2K_LOG_5(S, D, C, A, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "] " + M)
+#define LIBM2K_LOG_6(S, D, C, A, O, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "][" + O + "] " + M)
+
+#define LIBM2K_LOG_IF(S, COND, D, M) LOG_IF(S, COND) << ("[" + D + "] " + M)
+
 #else
-	#define LOG(x)
-#endif
 
-namespace libm2k {
-class LIBM2K_API Logger
-{
-public:
-    static Logger & getInstance();
-    void warn(std::string message);
+#define INFO 0
+#define WARNING 1
+#define ERROR 2
+#define FATAL 3
 
+#define LIBM2K_LOG_2(S, M) S
+#define LIBM2K_LOG_3(S, D, M) S
+#define LIBM2K_LOG_4(S, D, C, M) S
+#define LIBM2K_LOG_5(S, D, C, A, M) S
+#define LIBM2K_LOG_6(S, D, C, A, O, M) S
 
-private:
-	Logger();
-
-#ifdef LIBM2K_LOG4CPP
-
-        log4cpp::Appender *appender;
-        log4cpp::BasicLayout *basicLayout;
+#define LIBM2K_LOG_IF(S, COND, D, M) S
 
 #endif
-};
-}
 
-#endif // LOGGER_H
+#define LIBM2K_LOG_MACRO(_1, _2, _3, _4, _5, _6, NAME, ...) NAME
+#define LIBM2K_LOG(...) LIBM2K_LOG_MACRO(__VA_ARGS__, LIBM2K_LOG_6, LIBM2K_LOG_5, LIBM2K_LOG_4, LIBM2K_LOG_3, LIBM2K_LOG_2)(__VA_ARGS__)
+
+#endif // LOGGER_HPP
