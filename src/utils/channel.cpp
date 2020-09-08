@@ -21,6 +21,7 @@
 
 #include "channel.hpp"
 #include <libm2k/m2kexceptions.hpp>
+#include <libm2k/logger.hpp>
 #include <libm2k/utils/utils.hpp>
 #include <sstream>
 #include <iterator>
@@ -33,6 +34,8 @@ Channel::Channel(iio_device *device, unsigned int channel) {
 	if (m_device) {
 		m_channel = iio_device_get_channel(m_device, channel);
 	}
+	m_dev_name = iio_device_get_name(m_device);
+	m_channel_id = iio_channel_get_id(m_channel);
 
 	if (!m_channel) {
 		m_channel = nullptr;
@@ -124,8 +127,10 @@ void Channel::enableChannel(bool enable)
 	}
 
 	if (enable) {
+		LIBM2K_LOG(INFO, m_dev_name, m_channel_id, "Enable channel");
 		iio_channel_enable(m_channel);
 	} else {
+		LIBM2K_LOG(INFO, m_dev_name, m_channel_id, "Disable channel");
 		iio_channel_disable(m_channel);
 	}
 }
@@ -255,6 +260,7 @@ double Channel::getDoubleValue(std::string attr)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot read " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_READ, std::to_string(value));
 	return value;
 }
 
@@ -267,6 +273,7 @@ void Channel::setDoubleValue(std::string attr, double val)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_WRITE, std::to_string(val));
 }
 
 void Channel::setLongValue(std::string attr, long long val)
@@ -278,6 +285,7 @@ void Channel::setLongValue(std::string attr, long long val)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_WRITE, std::to_string(val));
 }
 
 long long Channel::getLongValue(std::string attr)
@@ -290,6 +298,7 @@ long long Channel::getLongValue(std::string attr)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_READ, std::to_string(value));
 	return value;
 }
 
@@ -302,6 +311,7 @@ void Channel::setStringValue(std::string attr, std::string val)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_WRITE, val);
 }
 
 std::string Channel::getStringValue(std::string attr)
@@ -314,6 +324,7 @@ std::string Channel::getStringValue(std::string attr)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_READ, value);
 	return std::string(value);
 }
 
@@ -326,6 +337,7 @@ void Channel::setBoolValue(std::string attr, bool val)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_WRITE, std::to_string(val));
 }
 
 bool Channel::getBoolValue(std::string attr)
@@ -338,6 +350,7 @@ bool Channel::getBoolValue(std::string attr)
 	if (ret < 0) {
 		THROW_M2K_EXCEPTION("Channel: Cannot write " + attr, libm2k::EXC_INVALID_PARAMETER, ret);
 	}
+	LIBM2K_LOG(INFO, m_dev_name, m_channel_id, attr, LIBM2K_ATTRIBUTE_READ, std::to_string(value));
 	return value;
 }
 
