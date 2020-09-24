@@ -77,8 +77,8 @@ private:
 	struct iio_device *m_device;
 	struct iio_channel *m_channel;
 
-	std::string m_dev_name;
-	std::string m_channel_id;
+	const char *m_dev_name;
+	const char *m_channel_id;
 
 };
 }

@@ -37,7 +37,7 @@ endif()
 add_library(${PROJECT_NAME} SHARED
 			${SRC_LIST}
                         ${HEADERS_LIST}
-			${DEVICES})
+			${DEVICES} logger.cpp)
 
 if (NOT WIN32)
 	find_library(PTHREAD_LIBRARIES pthread)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * Copyright (c) 2020 Analog Devices Inc.
  *
  * This file is part of libm2k
  * (see http://www.github.com/analogdevicesinc/libm2k).
@@ -22,10 +22,15 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
+#include <vector>
+
 // operations
 #define LIBM2K_ATTRIBUTE_WRITE "write"
 #define LIBM2K_ATTRIBUTE_READ "read"
 
+namespace libm2k {
+    static const char *getMessege(const std::vector<const char *> &info, const char *message);
+}
 #ifdef LIBM2K_ENABLE_LOG
 #include <glog/logging.h>
 
@@ -39,11 +44,11 @@
  *
  * Format: [D][C][A][O] M
  */
-#define LIBM2K_LOG_2(S, M) LOG(S) << M
-#define LIBM2K_LOG_3(S, D, M) LOG(S) << ("[" + D + "] " + M)
-#define LIBM2K_LOG_4(S, D, C, M) LOG(S) << ("[" + D + "][" + C + "] " + M)
-#define LIBM2K_LOG_5(S, D, C, A, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "] " + M)
-#define LIBM2K_LOG_6(S, D, C, A, O, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "][" + O + "] " + M)
+#define LIBM2K_LOG(S, M) LOG(S) << M
+//#define LIBM2K_LOG_3(S, D, M) LOG(S) << ("[" + D + "] " + M)
+//#define LIBM2K_LOG_4(S, D, C, M) LOG(S) << ("[" + D + "][" + C + "] " + M)
+//#define LIBM2K_LOG_5(S, D, C, A, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "] " + M)
+//#define LIBM2K_LOG_6(S, D, C, A, O, M) LOG(S) << ("[" + D + "][" + C + "][" + A + "][" + O + "] " + M)
 
 #define LIBM2K_LOG_IF(S, COND, D, M) LOG_IF(S, COND) << ("[" + D + "] " + M)
 
@@ -54,17 +59,17 @@
 #define ERROR 2
 #define FATAL 3
 
-#define LIBM2K_LOG_2(S, M) S
-#define LIBM2K_LOG_3(S, D, M) S
-#define LIBM2K_LOG_4(S, D, C, M) S
-#define LIBM2K_LOG_5(S, D, C, A, M) S
-#define LIBM2K_LOG_6(S, D, C, A, O, M) S
+#define LIBM2K_LOG(S, M)
+//#define LIBM2K_LOG_3(S, D, M) S
+//#define LIBM2K_LOG_4(S, D, C, M) S
+//#define LIBM2K_LOG_5(S, D, C, A, M) S
+//#define LIBM2K_LOG_6(S, D, C, A, O, M) S
 
 #define LIBM2K_LOG_IF(S, COND, D, M) S
 
 #endif
 
-#define LIBM2K_LOG_MACRO(_1, _2, _3, _4, _5, _6, NAME, ...) NAME
-#define LIBM2K_LOG(...) LIBM2K_LOG_MACRO(__VA_ARGS__, LIBM2K_LOG_6, LIBM2K_LOG_5, LIBM2K_LOG_4, LIBM2K_LOG_3, LIBM2K_LOG_2)(__VA_ARGS__)
+//#define LIBM2K_LOG_MACRO(_1, _2, _3, _4, _5, _6, NAME, ...) NAME
+//#define LIBM2K_LOG(...) LIBM2K_LOG_MACRO(__VA_ARGS__, LIBM2K_LOG_6, LIBM2K_LOG_5, LIBM2K_LOG_4, LIBM2K_LOG_3, LIBM2K_LOG_2)(__VA_ARGS__)
 
 #endif // LOGGER_HPP
